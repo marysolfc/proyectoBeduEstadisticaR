@@ -269,7 +269,7 @@ qqnorm(StanRes2)
 qqline(StanRes2)
 ```
 
-Con la función Shapiro-wilk contrasta si la distribucion muestral de la variables se asemeja a la distribucion normal
+Con la función Shapiro-wilk contrasta si la distribucion muestral de la variables se asemeja a la distribucion normal. Debido a que tenemos una muestra de datos amplia, usamos solo una subconjunto de 5000 datos para poder realizar el test.
 `shapiro.test(StanRes2[0:5000])`
 
 
