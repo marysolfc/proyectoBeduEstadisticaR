@@ -61,8 +61,11 @@ sd.alns <- sd(gasto.alns)
 
 ```
 Los resultados que obtenemos para el gasto en alimentos saludables es: 
+
 Moda: 550
+
 Mediana 530.5
+
 Media 593.989
 
 Con la desviación estándar 359.0136 se observa que las mediciones están muy concentrados a la media 593.989
@@ -70,9 +73,18 @@ Con la desviación estándar 359.0136 se observa que las mediciones están muy c
 Para los datos del gasto en alimentos No saludables
 
 Moda: 30
+
 Mediana: 55
+
 Media 107.8948
+
 Con desviación estándar de 145.7636 se observa que las mediciones tienen una dispersión cercana a la media 107.8948 
+
+Un dato importante es saber la media del gasto en alimentos saludables de las familias de nivel socieconómico alto
+
+`exp(mean(df[df$nse5f == "Alto", "ln_als"])) `
+
+Lo anterior indica que se tiene una media más alta que la media nacional.
 
 Continuando con el análisis descriptivo obtenemos los cuartiles para los datos del gasto en alimentos saludables
 
@@ -80,8 +92,11 @@ Continuando con el análisis descriptivo obtenemos los cuartiles para los datos 
 cuartiles.als <- quantile(gasto.als,probs = c(0.25,0.5,0.75))
 ```
 Lo cual nos indica que:
+
 25% del gasto en alimentos saludables tiene un valor de 345 o menos
+
 50% del gasto en alimentos saludables tiene un valor de 530.5 o menos
+
 75% del gasto en alimentos saludables tiene un valor de 760 o menos
 
 Mientras que para el gasto en alimentos no saludables
@@ -90,8 +105,11 @@ cuartiles.alns <- quantile(gasto.alns,probs = c(0.25,0.5,0.75))
 ```
 
 Se indica que:
+
 25% del gasto en alimentos NO saludables tiene un valor de 30 o menos
+
 50% del gasto en alimentos NO saludables tiene un valor de 55 o menos
+
 75% del gasto en alimentos NO saludables tiene un valor de 130 o menos
 
 #### Finalmente visualizamos con una gráfica el comportamiento del gasto en alimentos saludables y no saludables
@@ -105,6 +123,7 @@ hist(gasto.alns, main = "Distribución con sesgo a la derecha", xlab = "Gasto al
 
 # 3. Calcula probabilidades que nos permitan entender el problema en México
 Se realiza una gráfica para ver el comportamiento de la distribución de los datos del gasto en alimentos saludables y no saludables
+
 ```
 curve(dnorm(x, mean = mean(df$ln_als), sd = sd(df$ln_als)),from=3, to=9,col='blue', main = "Distribución normal alimentos saludables",
       ylab = "f(x)", xlab = "Gasto als en ln")
@@ -113,22 +132,24 @@ curve(dnorm(x, mean = mean(df$ln_alns), sd = mean(df$ln_alns)),from=-10, to=20,c
       ylab = "f(x)", xlab = "Gasto alns en ln")
 
 ```
+![distribucion](/images/distribuciones.JPG)
+
 Con lo anterior nos planteamos las siguientes preguntas
-"Qué probabilidad hay de que una familia gaste en alimentos saludables en un rango de 400 y 800"
+### Qué probabilidad hay de que una familia gaste en alimentos saludables en un rango de 400 y 800
 ```
 pnorm(q=800,media.als, sd = sd.als) - pnorm(q=400,media.als, sd = sd.als)
 ```
 Conclusión: la probabilidad sería de 42.25% y se puede observar en la gráfica
-![distribucion](/images/distribuciones.JPG)
+![probabilidad](/images/probabilidad.JPG)
 
-"Con una probabilidad del 30% cuál es el máximo gasto en alimentos saludables que haría una familia de nivel bajo"
+### Con una probabilidad del 30% cuál es el máximo gasto en alimentos saludables que haría una familia de nivel bajo
 ```
 media.nbajo <- exp(mean(df[df$nse5f == "Bajo", "ln_als"]))
 sd.nbajo <- exp(sd(df[df$nse5f == "Bajo", "ln_als"]))
 
 qnorm(p = .3, mean = media.nbajo, sd = sd.nbajo, lower.tail = T)
 ```
-Conclusión: con una probabilidad del 30%, se gastaría un máximo de 329.702 en alimento saludables
+#### Conclusión: con una probabilidad del 30%, se gastaría un máximo de 329.702 en alimento saludables
 
 
 # 4. Plantea hipótesis estadísticas y concluye sobre ellas para entender el problema en México
@@ -136,9 +157,12 @@ Conclusión: con una probabilidad del 30%, se gastaría un máximo de 329.702 en
 ### El estudio, señala que, el promedio del gasto en alimentos saludables es mayor  que el gasto en alimentos NO saludables
 #### A un NC del 90%, ¿EEE para concluir que eso sucede en nuestro estudio?
 
-Con lo anterior hacemos el siguiente
+Con lo anterior hacemos el siguiente:
+
 Planteamiento de hipótesis:
+
 Ho: prom_gasto_als <= prom_gasto_alns 
+
 Ha: prom_gasto_als > prom_gasto_alns"
 
 Si las varianzas son iguales v1/v2 = 1 por eso el ratio es 1
@@ -164,7 +188,9 @@ Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor d
 mayor que el gasto en alimentos no saludables
 
 También planteamos las siguientes hipótesis:
+
 Ho: las familias de niveles socieconómicos bajos gastan mas o igual en alimentos saludables que los de niveles altos
+
 Ha: las familias de niveles socioeconómicos bajos gastan menos en alimentos saludables que las familias de niveles socioeconómicos más altos
 ```
 t.test(df[df$nse5f == "Bajo", "ln_als"],
@@ -202,7 +228,7 @@ summary(m1)
 A un nivel de confianza del 99%
 Se observa que el coeficiente de la variable edadjef, nse5f y sexojef no son significativos ya que tiene un p-value mayores que el nivel de significancia 
 Probamos nuestro modelo sin incluir esas variables:
-gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + beta6*refin + beat8*IA + e
+gasto.als = beta0 + beta1\*numpeho + beta3\*añosedu + beta5\*area + beta6\*refin + beat8\*IA + e
 ```
 m2 <- update(m1, ~. - edadjef - nse5f - sexojef)
 summary(m2)
@@ -221,10 +247,10 @@ contra otro modelo sin efectos cruzados.
 
 Para ello, planteamos el siguiente juego de hipótesis:
 H0: beta2 = beta4 = beta7 = 0
-(gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + beta6*refin + beat8*IA + e )
+(gasto.als = beta0 + beta1\*numpeho + beta3\*añosedu + beta5\*area + beta6\*refin + beat8\*IA + e )
 
 H1: H0 no es verdad (AL MENOS UN COEFICIENTE ES DISTINTO DE 0)
-(gasto.als = beta0 + beta1*numpeho + beta2*edadjef + beta3*añosedu + beta4*nse5f + beta5*area + beta6*refin + beta7*sexojef + beat8*IA + e )
+(gasto.als = beta0 + beta1\*numpeho + beta2\*edadjef + beta3\*añosedu + beta4\*nse5f + beta5\*area + beta6\*refin + beta7\*sexojef + beat8\*IA + e )
 
 Para este tipo de inferencia usamos el enfoque de análisis de varianza (ANOVA), 
 ya que estamos comparando la variabilidad de un modelo no restringido contra la 
@@ -233,7 +259,7 @@ variabilidad de un modelo restringido.
 `anova(m2,mfull)`
 
 Como el p-value es menor que el grado se significancia entonces EEE para rechazar la hipótesis nula
-por lo tanto gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + e
+por lo tanto gasto.als = beta0 + beta1\*numpeho + beta3\*añosedu + beta5\*area + e
 
 
 #### Supuestos de la regresión lineal
@@ -281,6 +307,6 @@ Este estudio ha analizado cuantitativamente los determinantes socioeconómicos d
 Los resultados sugieren que las familias tienen un nivel educativo y un poder adquisitivo considerablemente más alto que la media nacional. 
 El análisis econométrico sugiere que el gasto en alimentos saludables está positivamente correlacionado con 
 el número de años de educación, la zona geográfica y el número de personas en el hogar, lo que refleja que 
-1) el consumo de alimentos saludables es restringido para los hogares pobres, y 
-2) los individuos con mayor educación tienen mayor acceso a información sobre los beneficios que conlleva el consumo de productos 
+1) El consumo de alimentos saludables es restringido para los hogares pobres, y 
+2) Los individuos con mayor educación tienen mayor acceso a información sobre los beneficios que conlleva el consumo de productos 
 saludables y los perjuicios que acarrea el consumo de alimentos no saludables. 
