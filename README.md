@@ -155,10 +155,10 @@ Planteamiento de hipótesis:
 Ho: prom_gasto_als <= prom_gasto_alns  
 Ha: prom_gasto_als > prom_gasto_alns  
 
-Si las varianzas son iguales v1/v2 = 1 por eso el ratio es 1
+Si las varianzas son iguales v1/v2 = 1 por eso el ratio es 1  
 Para comprobar, realizamos una prueba de varianzas con el planteamiento de hipótesis  
-Ho: v1/v2 = 1 
-Ha: v1/v2 != 1
+Ho: v1/v2 = 1  
+Ha: v1/v2 != 1  
 
 ```
 var.test(df[df$ln_als, 9],
@@ -174,11 +174,10 @@ t.test(x = exp(df[df$ln_als,9]), y = exp(df[df$ln_alns,10]),
        alternative = "greater",
        mu = 0, var.equal = FALSE)
 ```
-Con p-value < 2.2e-16
-Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor de la alternativa, es decir el promedio del gasto en alimentos saludables es 
-mayor que el gasto en alimentos no saludables
+Con p-value < 2.2e-16  
+Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor de la alternativa, es decir el promedio del gasto en alimentos saludables es mayor que el gasto en alimentos no saludables
 
-También planteamos las siguientes hipótesis:  
+#### También planteamos las siguientes hipótesis:  
 Ho: las familias de niveles socieconómicos bajos gastan mas o igual en alimentos saludables que los de niveles altos  
 Ha: las familias de niveles socioeconómicos bajos gastan menos en alimentos saludables que las familias de niveles  socioeconómicos más altos
 ```
@@ -234,11 +233,11 @@ Ahora debemos evaluar la significancia global del modelo, es decir,
 podemos comparar un modelo tomando en cuenta todos los efectos cruzados y compararlo 
 contra otro modelo sin efectos cruzados.
 
-Para ello, planteamos el siguiente juego de hipótesis:
-H0: beta2 = beta4 = beta7 = 0
+Para ello, planteamos el siguiente juego de hipótesis:  
+Ho: beta2 = beta4 = beta7 = 0  
 (gasto.als = beta0 + beta1\*numpeho + beta3\*añosedu + beta5\*area + beta6\*refin + beat8\*IA + e )
 
-H1: H0 no es verdad (AL MENOS UN COEFICIENTE ES DISTINTO DE 0)
+Ha: Ho no es verdad (AL MENOS UN COEFICIENTE ES DISTINTO DE 0)  
 (gasto.als = beta0 + beta1\*numpeho + beta2\*edadjef + beta3\*añosedu + beta4\*nse5f + beta5\*area + beta6\*refin + beta7\*sexojef + beat8\*IA + e )
 
 Para este tipo de inferencia usamos el enfoque de análisis de varianza (ANOVA), 
