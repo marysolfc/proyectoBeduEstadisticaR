@@ -5,7 +5,6 @@ df <- read.csv("https://raw.githubusercontent.com/beduExpert/Programacion-R-Sant
 
 # =====| 1. Plantea el problema del caso |===========
 "
-
 En este estudio se analizan los determinantes socioeconómicos de la inserguridad alimentaria en México
 Para ello se analizarán los datos por medio de una regresión lineal con el método de mínimos cuadrados ordinarios (OLS) y con ello
 establecer o determinar la relación existente entre el nivel socioeconómico y el gasto en productos no saludables ya que los datos sugieren 
@@ -43,7 +42,7 @@ summary(df)
 summary(df$ln_als)
 summary(df$ln_alns)
 
-#Dado que las variables ln_als y ln_alns están en logaritmo, necesitamos aplicar la función exponencial para obtenerlo el valor de la media, mediana, moda
+#Dado que las variables ln_als y ln_alns están en logaritmo, necesitamos aplicar la función exponencial para obtener el valor de la media, mediana, moda
 gasto.als <- exp(df$ln_als)
 gasto.alns <- exp(df$ln_alns)
 summary(gasto.als)
@@ -157,18 +156,19 @@ t.test(x = exp(df[df$ln_als,9]), y = exp(df[df$ln_alns,10]),
 #Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, el promedio de 
 # gasto en alimentos saludables es menor o igual que el gasto en alimentos no saludables
 
-
+### Otro planteamiento nos hace suponer que:
+#### Que las familias de nivel socioeconómico bajo gastan menos en alimentos saludables que las familias de nivel socioeconómico alto
 "
-Ho: las familias de niveles socieconómicos bajos gastan mas o igual en alimentos saludables que los de niveles altos
-Ha: las familias de niveles socioeconómicos bajos gastan menos en alimentos saludables que las familias de niveles socioeconómicos más altos
+Ho: gastoals_fam_nivelbajo >= gastoals_fam_nivelalto
+Ha: gastoals_fam_nivelbajo < gastoals_fam_nivelalto
 "
 
 t.test(df[df$nse5f == "Bajo", "ln_als"],
        df[df$nse5f == "Alto", "ln_als"],
-       alternative = "less", mu = media.alns, var.equal = TRUE)
+       alternative = "less", mu = media.als, var.equal = TRUE)
 
 # con p-value < 2.2e-16
-#Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor de la alternativa, es decir las familias  de niveles socioeconómicos 
+#Conclusión: A niveles de confianza estándar, EEE para rechazar la Ho, en favor de la alternativa, es decir las familias  de niveles socioeconómicos 
 #bajos gastan menos en alimentos saludables que las familias de niveles socioeconómicos más altos
 
 
@@ -209,7 +209,7 @@ summary(m2)
 "Para evaluar efectos cruzados, se tomarán las variables del modelo"
 # gasto.als = beta0 + beta1*numpeho + beta3*añosedu + e
 
-mfull <- lm(gasto.als ~ numpeho + añosedu + numpeho:añosedu + numpeho:area + numpeho:refin + numpeho:IA +añosedu:area + añosedu:refin + añosedu:IA)
+mfull <- lm(gasto.als ~ numpeho + añosedu + numpeho:añosedu + numpeho:area) # + numpeho:refin + numpeho:IA +añosedu:area + añosedu:refin + añosedu:IA)
 summary(mfull)
 
 "Ahora debemos evaluar la significancia global del modelo, es decir, 
@@ -278,7 +278,6 @@ Según este modelo de regresión lineal, el número de personas en el hogar, los
 determinan el gasto en alimentos saludables
 
 "
-
 
 # =====| 6. Escribe tu análisis en un archivo README.MD y tu código en un script de R y publica ambos en un repositorio de Github. |===========
 "

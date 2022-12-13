@@ -7,7 +7,7 @@
 
 #  1. Plantea el problema del caso 
 
-En este estudio se analizan los determinantes socioeconómicos de la inserguridad alimentaria en México
+En este estudio se analizan los determinantes socioeconómicos de la inserguridad alimentaria en México.
 Para ello se analizarán los datos por medio de una regresión lineal con el método de mínimos cuadrados ordinarios (OLS) y con ello
 establecer o determinar la relación existente entre el nivel socioeconómico y el gasto en productos no saludables ya que los datos sugieren 
 que los hogares con menor nivel socioeconómico tienden a gastar más en productos no saludables que 
@@ -49,6 +49,9 @@ Pero dado que las variables ln_als (logarítmo natural del gasto en alimentos sa
 las medidas de tendencia central: media, mediana, moda y la medida de dispersión como la desviación estándar
 
 ```
+gasto.als <- exp(df$ln_als)
+gasto.alns <- exp(df$ln_alns)
+
 media.als <- mean(gasto.als)
 mediana.als <- median(gasto.als)
 moda.als <- Mode(gasto.als)[1]
@@ -103,7 +106,7 @@ Se indica que:
 75% del gasto en alimentos NO saludables tiene un valor de 130 o menos  
 
 #### Finalmente visualizamos con una gráfica el comportamiento del gasto en alimentos saludables y no saludables
-Se puede observar el sesgo a la derecha en ambos casos
+Se puede observar el sesgo a la derecha en ambos casos, lo que nos indica que la mayor parte de las mediciones se concentran en los valores bajos.
 
 ```
 hist(gasto.als, main = "Distribución con sesgo a la derecha", xlab = "Gasto alimentos saludables") #moda < mediana < media
@@ -146,7 +149,7 @@ qnorm(p = .3, mean = media.nbajo, sd = sd.nbajo, lower.tail = T)
 
 # 4. Plantea hipótesis estadísticas y concluye sobre ellas para entender el problema en México
 
-### El estudio, señala que, el promedio del gasto en alimentos saludables es mayor  que el gasto en alimentos NO saludables
+### El estudio señala que, el promedio del gasto en alimentos saludables es mayor  que el promedio del gasto en alimentos NO saludables
 #### A un NC del 90%, ¿EEE para concluir que eso sucede en nuestro estudio?
 
 Con lo anterior hacemos el siguiente:  
@@ -166,7 +169,7 @@ var.test(df[df$ln_als, 9],
          ratio = 1, alternative = "two.sided")
 ```
 
-Como resultado obtenemos pvalue < nivel significancia por lo tanto se rechaza que las varianzas son iguales, con lo que se puede realizar una prueba t-Student
+Como resultado obtenemos pvalue (2.2e-16) < nivel significancia por lo tanto se rechaza que las varianzas son iguales, con lo que se puede realizar una prueba t-Student
 para mostrar evidencia sobre la hipótesis señalada en un principio
 
 ```
@@ -175,11 +178,15 @@ t.test(x = exp(df[df$ln_als,9]), y = exp(df[df$ln_alns,10]),
        mu = 0, var.equal = FALSE)
 ```
 Con p-value < 2.2e-16  
-Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor de la alternativa, es decir el promedio del gasto en alimentos saludables es mayor que el gasto en alimentos no saludables
+**Conclusión:** A niveles de confianza estándar, EEE para rechazar la Ho, en favor de la alternativa, es decir el promedio del gasto en alimentos saludables es mayor que el promedio del gasto en alimentos no saludables
 
-#### También planteamos las siguientes hipótesis:  
-Ho: las familias de niveles socieconómicos bajos gastan mas o igual en alimentos saludables que los de niveles altos  
-Ha: las familias de niveles socioeconómicos bajos gastan menos en alimentos saludables que las familias de niveles  socioeconómicos más altos
+### Otro planteamiento nos hace suponer que:
+#### Que las familias de nivel socioeconómico bajo gastan menos en alimentos saludables que las familias de nivel socioeconómico alto
+
+Ho: gastoals_fam_nivelbajo >= gastoals_fam_nivelalto  
+Ha: gastoals_fam_nivelbajo < gastoals_fam_nivelalto   
+
+
 ```
 t.test(df[df$nse5f == "Bajo", "ln_als"],
        df[df$nse5f == "Alto", "ln_als"],
@@ -204,9 +211,10 @@ round(cor(df.select),4)
 pairs(~ gasto.als + numpeho + edadjef + añosedu, 
       data = df, gap = 0.4, cex.labels = 1.5)
 ```
+#### Dadas las características de las variables, nos vamos a decantar por un modelo de regresión lineal y establecer los determinantes por medio de mínimos cuadrados ordinarios
 
 ### Estimación por Mínimos Cuadrados Ordinarios (OLS)
-Se propone el siguiente modelo de regresión lineal con todas las variables
+Se propone el siguiente modelo de regresión lineal con todas las variables  
 gasto.als = beta0 + beta1\*numpeho + beta2\*edadjef + beta3\*añosedu + beta4\*nse5f + beta5\*area + beta6\*refin + beta7\*sexojef + beat8\*IA + e"
 
 ```
@@ -214,7 +222,7 @@ m1 <- lm(gasto.als ~ numpeho + edadjef + añosedu + nse5f + area + refin + sexoj
 summary(m1)
 ```
 A un nivel de confianza del 99%
-Se observa que el coeficiente de la variable edadjef, nse5f y sexojef no son significativos ya que tiene un p-value mayores que el nivel de significancia 
+Se observa que el coeficiente de la variable edadjef, nse5f y sexojef no son significativos ya que tiene un p-value mayores que el nivel de significancia.   
 Probamos nuestro modelo sin incluir esas variables:
 gasto.als = beta0 + beta1\*numpeho + beta3\*añosedu + beta5\*area + beta6\*refin + beat8\*IA + e
 ```
