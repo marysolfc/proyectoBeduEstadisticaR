@@ -57,10 +57,13 @@ library(DescTools)
 moda.als <- Mode(gasto.als)[1]
 moda.alns <- Mode(gasto.alns)[1]
 
+
 moda.als;mediana.als;media.als
 "[1] 550
 [1] 530.5
 [1] 593.989"
+
+exp(mean(df[df$nse5f == "Alto", "ln_als"])) # La media del gasto en alimentos saludables de las familias de nivel socieconómico alto
 sd.als <- sd(gasto.als) # las mediciones tienen una dispersión de 359.0136 de la media 593.989
 
 moda.alns;mediana.alns;media.alns
@@ -96,25 +99,34 @@ dev.off()
 
 par(mfrow = c(1,2))
 
-curve(dnorm(x, mean = mean(df$ln_als), sd = sd(df$ln_als)),from=2, to=10,col='blue', main = "Distribución Normal",
+curve(dnorm(x, mean = mean(df$ln_als), sd = sd(df$ln_als)),from=3, to=9,col='blue', main = "Distribución normal alimentos saludables",
       ylab = "f(x)", xlab = "Gasto als en ln")
 
-curve(dnorm(x, mean = media.als, sd = sd.als),from=-1000, to=2000,col='green', main = "Distribución Normal",
-      ylab = "f(x)", xlab = "Gasto als")
+curve(dnorm(x, mean = mean(df$ln_alns), sd = mean(df$ln_alns)),from=-10, to=20,col='red', main = "Distribución normal alimentos no saludables",
+      ylab = "f(x)", xlab = "Gasto alns en ln")
 dev.off()
 
-### Estas probabilidades se quedaron propuestas, falta resolver!!!
 
-"Qué probabilidad hay de que una familia gaste en alimentos (saludables y no saludables) en un rango de 400 y 800"
+"Qué probabilidad hay de que una familia gaste en alimentos saludables en un rango de 400 y 800"
 
-"Qué probabilidad hay de una familia de nivel medio gaste mas de 200 en alimentos no saludables "
+pnorm(q=800,media.als, sd = sd.als) - pnorm(q=400,media.als, sd = sd.als)
+x <- seq(-4, 4, 0.01)*sd.als + media.als
+y <- dnorm(x, mean = media.als, sd = sd.als)
 
-"Qué probabilidad hay de que una familia de nivel bajo gaste en alimentos saludables"
+plot(x, y, type = "l", xlab="", ylab="")
+title(main = "Gastan entre 400 y 800", sub = expression(paste(mu == media.als, " y ", sigma == sd.als)))
+polygon(c(400, x[x>=400 & x<=800], 800), c(0, y[x>=400 & x<=800], 0), col="green")
 
-"Qué probabilidad hay que una familia de la zona rural presente IA"
+"Conclusión: la probabilidad sería de 42.25%"
 
-"Qué probabilidad hay que una familia de zona urbana presente IA"
+"Con una probabilidad del 30% cuál es el máximo gasto en alimentos saludables que haría una familia de nivel bajo"
+media.nbajo <- exp(mean(df[df$nse5f == "Bajo", "ln_als"]))
+sd.nbajo <- exp(sd(df[df$nse5f == "Bajo", "ln_als"]))
+media.nbajo; sd.nbajo
 
+qnorm(p = .3, mean = media.nbajo, sd = sd.nbajo, lower.tail = T)
+
+"Conclusión: gastaría un máximo de 329.702"
 
 
 # =========| 4. Plantea hipótesis estadísticas y concluye sobre ellas para entender el problema en México |===============
@@ -135,7 +147,7 @@ var.test(df[df$ln_als, 9],
          df[df$ln_alns,10], 
          ratio = 1, alternative = "two.sided")
 
-# pvalue > nivel significancia por lo tanto se rechazar que lass varianzas son iguales
+# pvalue < nivel significancia por lo tanto se rechaza que las varianzas son iguales
 
 t.test(x = exp(df[df$ln_als,9]), y = exp(df[df$ln_alns,10]),
        alternative = "greater",
@@ -146,12 +158,21 @@ t.test(x = exp(df[df$ln_als,9]), y = exp(df[df$ln_alns,10]),
 # gasto en alimentos saludables es menor o igual que el gasto en alimentos no saludables
 
 
-
-"Ho: las familias de niveles socioeconómicos bajos gastan más en alimentos no saludables que las familias de niveles socioeconómicos más altos
-Ha: !Ho
+"
+Ho: las familias de niveles socieconómicos bajos gastan mas o igual en alimentos saludables que los de niveles altos
+Ha: las familias de niveles socioeconómicos bajos gastan menos en alimentos saludables que las familias de niveles socioeconómicos más altos
 "
 
-# ========| 5. Estima un modelo de regresión, lineal o logístico, para identificiar los determinantes de la inseguridad alimentaria en México |====
+t.test(df[df$nse5f == "Bajo", "ln_als"],
+       df[df$nse5f == "Alto", "ln_als"],
+       alternative = "less", mu = media.alns, var.equal = TRUE)
+
+# con p-value < 2.2e-16
+#Conclusión: A niveles de confianza estadar, EEE para rechazar la Ho, en favor de la alternativa, es decir las familias  de niveles socioeconómicos 
+#bajos gastan menos en alimentos saludables que las familias de niveles socioeconómicos más altos
+
+
+# ========| 5. Estima un modelo de regresión, lineal o logístico, para identificar los determinantes de la inseguridad alimentaria en México |====
 #Y = Bo + B1X + B2X2
 library(dplyr)
 
@@ -161,12 +182,6 @@ df.select <- select(df,ln_als,numpeho, edadjef, añosedu)
 round(cor(df.select),4)  
 
 # se muestra una matriz con las gráficas de dispersión 
-pairs(~ gasto.als + numpeho + edadjef + añosedu, 
-      data = df, gap = 0.4, cex.labels = 1.5)
-
-"pairs(~ ln_als + numpeho + edadjef + añosedu, 
-      data = df, gap = 0.4, cex.labels = 1.5)"
-
 pairs(~ gasto.als + numpeho + edadjef + añosedu + nse5f + area + refin + sexojef + IA, 
 data = df, gap = 0.4, cex.labels = 1.5)
 
@@ -177,27 +192,24 @@ gasto.als = beta0 + beta1*numpeho + beta2*edadjef + beta3*añosedu + beta4*nse5f
 attach(df) # toma todas las variables del dataframe y los enmascara para acceder a las variables solo nombrandolas
 #m1 <- lm(gasto.als ~ numpeho + edadjef + añosedu) #funcion lm lineal model
 #summary(m1)
-"Nota: hace falta realizar el estudio tomando en cuenta todas las variables y comparar."
-m1 <- lm(ln_als ~ numpeho + edadjef + añosedu + nse5f + area + refin + sexojef + IA) 
+
+m1 <- lm(gasto.als ~ numpeho + edadjef + añosedu + nse5f + area + refin + sexojef + IA) 
 summary(m1)
 
 
 #A un nivel de confianza del 99%
-#se observa que el coeficiente de la variable edadjef no es significativo ya que tiene un p-value = 0.01 
-#Probemos nuestro modelo sin incluir dicha variable:
-#gasto.als = beta0 + beta1*numpeho + beta3*añosedu + e
-#m2 <- update(m1, ~.-edadjef)
-#summary(m2)
-
-m2 <- update(m1, ~.-edadjef - nse5f - sexojef)
+#se observa que el coeficiente de la variable edadjef, nse5f y sexojef no son significativos ya que tiene un p-value mayores que el nivel de significancia 
+#Probamos nuestro modelo sin incluir esas variables:
+#gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + beta6*refin + beat8*IA + e
+m2 <- update(m1, ~. - edadjef - nse5f - sexojef)
 summary(m2)
 
+
 # TÉRMINOS DE INTERACCIÓN
-"Para evaluar efectos cruzados, se tomarán las dos variables del modelo"
+"Para evaluar efectos cruzados, se tomarán las variables del modelo"
 # gasto.als = beta0 + beta1*numpeho + beta3*añosedu + e
 
-mfull <- lm(ln_als ~ numpeho + añosedu + numpeho:añosedu)
-
+mfull <- lm(gasto.als ~ numpeho + añosedu + numpeho:añosedu + numpeho:area + numpeho:refin + numpeho:IA +añosedu:area + añosedu:refin + añosedu:IA)
 summary(mfull)
 
 "Ahora debemos evaluar la significancia global del modelo, es decir, 
@@ -205,10 +217,11 @@ podemos comparar un modelo tomando en cuenta todos los efectos cruzados y compar
 contra otro modelo sin efectos cruzados.
 
 Para ello, planteamos el siguiente juego de hipótesis:
-H0: beta2 = 0
-(gasto.als = beta0 + beta1*numpeho + beta3*añosedu + e)
+Ho: beta2 = beta4 = beta7 = 0
+(gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + beta6*refin + beat8*IA + e )
 
-H1: H0 no es verdad (gasto.als = beta0 + beta1*numpeho + beta2*edadjef + beta3*añosedu + e)
+Ha: Ho no es verdad (AL MENOS UN COEFICIENTE ES DISTINTO DE 0)
+(gasto.als = beta0 + beta1*numpeho + beta2*edadjef + beta3*añosedu + beta4*nse5f + beta5*area + beta6*refin + beta7*sexojef + beat8*IA + e )
 
 Para este tipo de inferencia usamos el enfoque de análisis de varianza (ANOVA), 
 ya que estamos comparando la variabilidad de un modelo no restringido contra la 
@@ -216,8 +229,8 @@ variabilidad de un modelo restringido."
 
 anova(m2,mfull)
 
-# Como el p-value es 0.6642 entonces no rechazamos la hipótesis nula
-# por lo tanto gasto.als = beta0 + beta1*numpeho + beta3*añosedu + e
+# Como el p-value es menor que el grado se significancia entonces EEE para rechazar la hipótesis nula
+# por lo tanto gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + e
 
 
 # Supuestos de la regresión lineal
@@ -229,7 +242,7 @@ explicativas. En caso contrario, tendríamos un problema de endogeneidad.
 
 #Se tomaran los residuos estandarizados
 
-StanRes2 <- rstandard(m2)
+StanRes2 <- rstandard(m3)
 par(mfrow = c(2, 2))
 plot(numpeho, StanRes2, ylab = "Residuales Estandarizados")
 plot(añosedu, StanRes2, ylab = "Residuales Estandarizados")
@@ -242,7 +255,8 @@ qqline(StanRes2)
 dev.off()
 
 # contrasta si la distribucion muestral de la variables se asemeja a la distribucion normal
-shapiro.test(StanRes2)
+#shapiro.test(StanRes2)
+shapiro.test(StanRes2[0:5000])
 
 
 #Se vuelven a tomar los residuos estandarizados, pero ahora del modeloFull
@@ -269,10 +283,10 @@ determinan el gasto en alimentos saludables
 # =====| 6. Escribe tu análisis en un archivo README.MD y tu código en un script de R y publica ambos en un repositorio de Github. |===========
 "
 Este estudio ha analizado cuantitativamente los determinantes socioeconómicos del gasto en alimentos saludables en México.
-Los resultados sugieren que las familias tienen un nivel educativo y un poder adquisitivo considerablemente más alto que la media nacional. 
+Los resultados sugieren que las familias que tienen un nivel educativo y un poder adquisitivo considerablemente más alto que la media nacional. 
 El análisis econométrico sugiere que el gasto en alimentos saludables está positivamente correlacionado con 
 el número de años de educación, la zona geográfica y el número de personas en el hogar, lo que refleja que 
-1) el consumo de alimentos saludables es restringido para los hogares pobres, y 
+1) el consumo de alimentos saludables es restringido para los hogares de nivel socieconómico bajo, y 
 2) los individuos con mayor educación tienen mayor acceso a información sobre los beneficios que conlleva el consumo de productos 
 saludables y los perjuicios que acarrea el consumo de alimentos no saludables. 
 
