@@ -290,7 +290,7 @@ determinan el gasto en alimentos saludables
 
 
 # 6. Escribe tu análisis en un archivo README.MD y tu código en un script de R y publica ambos en un repositorio de Github.
-
+## Conclusiones
 Este estudio ha analizado cuantitativamente los determinantes socioeconómicos del gasto en alimentos saludables en México.
 Los resultados sugieren que las familias tienen un nivel educativo y un poder adquisitivo considerablemente más alto que la media nacional. 
 El análisis econométrico sugiere que el gasto en alimentos saludables está positivamente correlacionado con 
