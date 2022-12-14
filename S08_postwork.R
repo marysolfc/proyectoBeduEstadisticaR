@@ -242,7 +242,7 @@ explicativas. En caso contrario, tendríamos un problema de endogeneidad.
 
 #Se tomaran los residuos estandarizados
 
-StanRes2 <- rstandard(m3)
+StanRes2 <- rstandard(m2)
 par(mfrow = c(2, 2))
 plot(numpeho, StanRes2, ylab = "Residuales Estandarizados")
 plot(añosedu, StanRes2, ylab = "Residuales Estandarizados")

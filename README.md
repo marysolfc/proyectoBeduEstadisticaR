@@ -1,5 +1,14 @@
 # Proyecto final del curso de Bedu fase 2: programación y estadística con R
 ## Este repositorio contiene todos los postworks del curso de Bedu fase 2: programación y estadística con R
+### Equipo 12:
+- Armando Sanchez
+- Carlos Briceño
+- Fermín Ramírez Ríos
+- Gerardo Ascencio
+- Marisol Flores Castro
+- Miguel Angel Garibay Cocco
+
+
 ## PostWork sesion 8
 
 ##### Datos a utilizar
