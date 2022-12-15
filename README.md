@@ -124,9 +124,7 @@ hist(gasto.alns, main = "Distribución con sesgo a la derecha", xlab = "Gasto al
 ![histogramas](/images/histogramas.JPG)
 
 # 3. Calcula probabilidades que nos permitan entender el problema en México
-Se realiza una gráfica para ver el comportamiento de la distribución de los datos del gasto en alimentos saludables y no saludables.
-
-Como en los histogramas anteriores, los datos distribuyen con una distribución normal, por lo que procedemos a visualizar en una gráfica esa distribución.
+Bajo el teorema del límite central, podemos graficar la distribución normal de las medias de las variables ln_als y ln_alns
 
 ```
 curve(dnorm(x, mean = mean(df$ln_als), sd = sd(df$ln_als)),from=3, to=9,col='blue', main = "Distribución normal alimentos saludables",
@@ -139,14 +137,14 @@ curve(dnorm(x, mean = mean(df$ln_alns), sd = mean(df$ln_alns)),from=-10, to=20,c
 ![distribucion](/images/distribuciones.JPG)
 
 Con lo anterior nos planteamos las siguientes preguntas
-### Qué probabilidad hay de que una familia gaste en alimentos saludables en un rango de 400 y 800
+### Qué probabilidad hay de que el gasto promedio en alimentos saludables que haga una familia se encuentre en un rango de 400 y 800
 ```
 pnorm(q=800,media.als, sd = sd.als) - pnorm(q=400,media.als, sd = sd.als)
 ```
 Conclusión: la probabilidad sería de 42.25% y se puede observar en la gráfica
 ![probabilidad](/images/probabilidad.JPG)
 
-### Con una probabilidad del 30% cuál es el máximo gasto en alimentos saludables que haría una familia de nivel bajo
+### Con una probabilidad del 30% cuál es el promedio máximo en gasto en alimentos saludables que haría una familia de nivel bajo
 ```
 media.nbajo <- exp(mean(df[df$nse5f == "Bajo", "ln_als"]))
 sd.nbajo <- exp(sd(df[df$nse5f == "Bajo", "ln_als"]))

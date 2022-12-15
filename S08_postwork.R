@@ -94,7 +94,8 @@ dev.off()
 
 
 # =======| 3. Calcula probabilidades que nos permitan entender el problema en México |==================
-"Se realiza una gráfica para ver el comportamiento de la distribución de los datos del gasto en alimentos saludables y no saludables"
+"Bajo el teorema del límite central, podemos graficar la distribución normal de las medias de las variables ln_als y ln_alns"
+
 
 par(mfrow = c(1,2))
 
@@ -106,7 +107,7 @@ curve(dnorm(x, mean = mean(df$ln_alns), sd = mean(df$ln_alns)),from=-10, to=20,c
 dev.off()
 
 
-"Qué probabilidad hay de que una familia gaste en alimentos saludables en un rango de 400 y 800"
+"Qué probabilidad hay de que el gasto promedio en alimentos saludables que haga una familia se encuentre en un rango de 400 y 800"
 
 pnorm(q=800,media.als, sd = sd.als) - pnorm(q=400,media.als, sd = sd.als)
 x <- seq(-4, 4, 0.01)*sd.als + media.als
@@ -118,7 +119,7 @@ polygon(c(400, x[x>=400 & x<=800], 800), c(0, y[x>=400 & x<=800], 0), col="green
 
 "Conclusión: la probabilidad sería de 42.25%"
 
-"Con una probabilidad del 30% cuál es el máximo gasto en alimentos saludables que haría una familia de nivel bajo"
+"Con una probabilidad del 30% cuál es el promedio máximo en gasto en alimentos saludables que haría una familia de nivel bajo"
 media.nbajo <- exp(mean(df[df$nse5f == "Bajo", "ln_als"]))
 sd.nbajo <- exp(sd(df[df$nse5f == "Bajo", "ln_als"]))
 media.nbajo; sd.nbajo
@@ -178,12 +179,14 @@ library(dplyr)
 
 df.select <- select(df,ln_als,numpeho, edadjef, añosedu)
 
-# se muestra la matriz de correlación de las variables cuantitativas
+# Comenzamos por visualizar una matriz de correlación de las variables cuantitativas
 round(cor(df.select),4)  
 
 # se muestra una matriz con las gráficas de dispersión 
 pairs(~ gasto.als + numpeho + edadjef + añosedu + nse5f + area + refin + sexojef + IA, 
 data = df, gap = 0.4, cex.labels = 1.5)
+
+# Dadas las características de las variables, nos vamos a decantar por un modelo de regresión lineal y establecer los determinantes por medio de mínimos cuadrados ordinarios
 
 "Estimación por Mínimos Cuadrados Ordinarios (OLS)
 gasto.als = beta0 + beta1*numpeho + beta2*edadjef + beta3*añosedu  + e
@@ -199,9 +202,11 @@ summary(m1)
 
 #A un nivel de confianza del 99%
 #se observa que el coeficiente de la variable edadjef, nse5f y sexojef no son significativos ya que tiene un p-value mayores que el nivel de significancia 
+#además, vamos a quitar las variables refin y área para quedarnos sólo con las variables que pueden
+#ser determinantes para el gasto de alimentos saludables
 #Probamos nuestro modelo sin incluir esas variables:
 #gasto.als = beta0 + beta1*numpeho + beta3*añosedu + beta5*area + beta6*refin + beat8*IA + e
-m2 <- update(m1, ~. - edadjef - nse5f - sexojef)
+m2 <- update(m1, ~. - edadjef - nse5f - sexojef - refin - IA)
 summary(m2)
 
 
